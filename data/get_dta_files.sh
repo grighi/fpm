@@ -46,7 +46,7 @@ s/<!--.*-->// }' |
 
 # unzip those guys with appropriate name
 # !! it would be nice to unzip and run stata (see end) on these one-by-one, but some of the do-files have different names, so it won't work :(
-parallel "unzip -p {} > {= s:([a-z]{3,}[0-9]+).+:\1:; =}.dat" ::: *.zip 
+parallel "unzip -p {} > cps{= s:([a-z]{3,}[0-9]+).+:\1:; =}.dat" ::: *.zip 
 rm *.zip
 
 
@@ -140,23 +140,52 @@ for pid in ${pids[*]}; do
   wait $pid; 
 done;
 
+# in May 2017, should read 220 files
 
 # now get the revised weights
-cd new_weights_2000-2002
-
+cd new_weights_2000-2002/
 wget http://thedataweb.rm.census.gov/pub/cps/basic/199801-/pubuse2000_2002.tar.zip
-tar -xzvf pubuse2000_2002.tar.zip
-if [ ! -d dta ]; then mkdir dta; fi
+
+unzip pubuse2000_2002.tar.zip && rm pubuse2000_2002.tar.zip
+tar -xvf pubuse2000_2002.tar && rm pubuse2000_2002.tar
+# a couple files need write permissions
+chmod +w *_2000b.dat 
+
+if [ ! -d dta ]; 
+  then mkdir dta; 
+fi
+
 stata -b do init.do
+
+rm *_2000b.dat
 
 cd ..
 
-stata -b do add_weights.do
-
-## if using Stanford data, you may want:
+# if set up for the Stanford AFS files, you may prefer:
 # stata -b do concatenate_cps_1999-2016.do
+# else
+stata -b do add_weights_monthly.do
+
+# clean up
+rm *.dat
+
+if [ ! -d dta ]; 
+  then mkdir logs; 
+fi
+mv *.dta dta/
+
+if [ ! -d logs ]; 
+  then mkdir logs; 
+fi
+mv *.log logs/
+
+if [ ! -d dofiles ]; 
+  then mkdir dofiles; 
+fi
+mv *.{do,dct} dofiles/
 
 # rm cps[a-z]*.dta cps*.do *.dct
 
+######## ERROR: add_weights is still not working correctly and needs to be modified before continuing.
 
 

@@ -17,10 +17,11 @@ mkdir ../inputs/
 
 bash get_dta_files.sh
 
-cd ..
-mkdir data-intermediate
-mkdir inputs
+cd ../data-asec
 
+bash get_asec_dta.sh
+
+mkdir data-intermediate
 mv data_clean.R inputs/
 ./data_clean.R
 
