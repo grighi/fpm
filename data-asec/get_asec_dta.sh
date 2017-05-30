@@ -111,7 +111,6 @@ for datafile in *.dat; do
   # file names also appear a different way in some do files
   sed -i "s/\(quietly infile using \)\(cpsmar[0-9]*\)/\1\\2.dct, using(\2.dat)/" $reader
 
-  # convert to dta and remove dat
   $(stata -b do $reader) &
 #&& rm $datafile) &
   pids[${i}]=$!; ((i+=1));
@@ -143,6 +142,12 @@ fi
 mv *.{do,dct} dofiles/
 
 rm {*.smcl,*.zip,*.zip.*,*.dat}
+
+rename cpsmar20 cpsmar *
+
+mv cpsmar* ../inputs
+
+
 
 
 
