@@ -186,6 +186,6 @@ mv *.{do,dct} dofiles/
 
 # rm cps[a-z]*.dta cps*.do *.dct
 
-######## ERROR: add_weights is still not working correctly and needs to be modified before continuing.
+
 
 

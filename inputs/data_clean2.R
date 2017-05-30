@@ -44,7 +44,7 @@ foreach(yr = 2000:2016) %dopar% {
     
     # extract relevant month
     # (not sure how memory is handled here -- does R drop the rest well?)
-    cps <- paste0('../data/cps', tolower(month.abb[mo]), substr(yr, 3,4),'.dta') %>% 
+    cps <- paste0('../data/dta/cps', tolower(month.abb[mo]), substr(yr, 3,4),'.dta') %>% 
       read.dta13(convert.factors = F) %>% 
       data.table
     
