@@ -1,3 +1,5 @@
+# Get most recent CPI and save as dataframe
+
 library(blsAPI)
 library(rjson)
 library(feather)

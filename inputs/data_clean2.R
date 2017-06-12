@@ -8,64 +8,31 @@ library(feather)
 library(doMC)
 registerDoMC(3)
 
-
-# variables that need to be rewritten because we will use them
-# question: how well do the following variables match across march basic CPS / asec?
-# - hufaminc - prfamtyp/ftype - prfamnum/ffpos
-
-# ASEC:
-# ftotval
-# h_idnum
-# a _lineno
-# ftype
-# ffpos
-
-
-# CPS:
-# month
-# prfamtyp
-# peage
-# hrhhid
-# prfamnum
-# pulineno
-# -- but others are required since running RF
-
 foreach(yr = 2000:2016) %dopar% {
- 
-# extract data froms stata file, save to feather to save memory
-  # (not sure how memory is handled here -- does R spawn an environment with `%>%`?)
-  # paste0('../data/cps_monthly_', substr(yr, 3,4),'.dta') %>%
-  #   read.dta13(convert.factors = F) %>%
-  #   write_feather('cpsyearly.f')
-  
-  for (mo in 1:12) {
+   for (mo in 1:12) {
     message(paste(yr, 'Month', mo))
-    index <- yr - 1999 + 1  # index for output vector
-    
+
     # extract relevant month
-    # (not sure how memory is handled here -- does R drop the rest well?)
     cps <- paste0('../data/dta/cps', tolower(month.abb[mo]), substr(yr, 3,4),'.dta') %>% 
       read.dta13(convert.factors = F) %>% 
       data.table
     
     ## when calculate regression trees, want to drop unuseful variables
-    # DROP:
+    # e.g. DROP:
     #   - name starts with an underscore
     #   - variable has only one value
     #   - more than 1/2 of variable are missing values
-    
     # cps <- as.data.frame(cps)[, which(sapply(as.data.frame(cps), function(x) length(table(x))) > 1)] %>%
     #   # .[, -grep("^\\_", names(cps))] %>%
     #   # .[, which(sapply(., function(x) !is.character(x)))] %>%
     #   .[, which(sapply(., function(x) sum(is.na(x))) <= nrow(.)/2)] %>%
     #   data.table
     
-    # rename weights
+    # rename weights variable
     if (yr < 2003)
       names(cps)[grep('_nwsswgt', names(cps))] <- 'weight.fn' else
         names(cps)[grep('pwsswgt', names(cps))] <- 'weight.fn'
     cps[is.na(weight.fn), weight.fn := 0]
-    
     # rename age variable
     if (yr == 2012 & mo >= 5)
       names(cps)[grep('prtage', names(cps))] <- 'peage'
@@ -94,7 +61,6 @@ foreach(yr = 2000:2016) %dopar% {
     ## alternatively we could save it as a feather
     # feathername <- paste0('../data-intermediate/cps', month.abb[mo], substr(yr, 3,4), '.f')
     # feather::write_feather(cps, feathername)
-    
   }
   rm(cps)
   gc()
