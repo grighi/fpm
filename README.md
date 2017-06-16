@@ -14,7 +14,7 @@ The project builds with bash, [git](https://git-for-windows.github.io/), [Python
 git clone https://github.com/grighi/fpm.git
 
 cd fpm
-./build_portable.sh
+./portable_build.sh
 ```
 
 
