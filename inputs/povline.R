@@ -1,3 +1,4 @@
+#!/usr/bin/Rscript
 # Calculate families' poverty status from the ASEC. This is as close as we can get to replicating the official poverty measure.
 
 library(data.table)
@@ -10,13 +11,13 @@ library(magrittr)
 source('thresholds.R')
 
 # datafiles names
-files <- paste0('../data-asec/cpsmar', sprintf(0:16, fmt = '%0.2i'), '.dta')
+files <- paste0('../data-asec/dta/cpsmar', sprintf(0:16, fmt = '%0.2i'), '.dta')
 
 poverty <- vector(length = 16)
 for (yr in 1999:2015) {
   message(yr)
   
-  rewrite <- F
+  rewrite <- T
   
   # asec gives OPM of previous year
   i <- yr - 1999 + 1

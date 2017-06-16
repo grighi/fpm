@@ -1,4 +1,4 @@
-#!/bin/Rscript
+#!/usr/bin/Rscript
 # Download required pacakges
 # June 1, 2017 -- G Righi -- modified from GS-Lab script
 

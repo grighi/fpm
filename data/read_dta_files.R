@@ -1,17 +1,6 @@
 #! /usr/bin/Rscript
 
-datafile <- commandArgs(trailingOnly=TRUE)
-
-mo <- substr(datafile, 4, 6)
-yr <- substr(datafile, 7, 8)
-
-mos <- tolower(month.abb)
-m <- which(mos == mo)
-yrs <- 1970:2069
-y <- yrs[which(substr(as.character(yrs), 3, 4) == yr)]
-
-serial <- as.numeric(y) * 100 + as.numeric(m)
-
+# the following is inspired by the dict construct in python but is a clunky way to do this:
 readers <- list(
   list(201501:as.numeric(format(Sys.time(), "%Y%m")), 'cpsbjan2015.do'),
   list(201404:201412, 'cpsbapr2014.do'),
@@ -34,8 +23,26 @@ find_reader <- function(x, find){
   }
 }
 
-r <- unlist(lapply(readers, find_reader, find = serial))
+# r <- unlist(lapply(readers, find_reader, find = serial))
+# 
+# r <- unique(r)
+# 
+# write(r, stdout())
 
-r <- unique(r)
-
-write(r, stdout())
+for (datafile in list.files(pattern = 'dat')) {
+  mo <- substr(datafile, 4, 6)
+  yr <- substr(datafile, 7, 8)
+  
+  mos <- tolower(month.abb)
+  m <- which(mos == mo)
+  yrs <- 1970:2069
+  y <- yrs[which(substr(as.character(yrs), 3, 4) == yr)]
+  
+  serial <- as.numeric(y) * 100 + as.numeric(m)
+  
+  reader <- unlist(lapply(readers, find_reader, find = serial))
+  dict   <- sub('do', 'dct', reader)
+  dta    <- sub('do', 'dta', reader)
+  
+  readLines(reader)
+}

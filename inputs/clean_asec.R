@@ -1,3 +1,5 @@
+#!/usr/bin/Rscript
+
 library(readstata13)
 library(data.table)
 library(magrittr)
@@ -5,7 +7,7 @@ library(feather)
 
 #setwd('~/Documents/fpm/inputs')
 
-files <- c(paste0('cpsmar', sprintf('%0.2i', 00:16), '.dta'))
+files <- c(paste0('../data-asec/dta/cpsmar', sprintf('%0.2i', 00:16), '.dta'))
 
 mo <- 3
 

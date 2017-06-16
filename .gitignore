@@ -4,8 +4,17 @@
 **.fthr
 **.f
 **.png
+**.tar
+**.pdf
+**.pdf
+**.pdf
+**.pdf
+**.pdf
+**.pdf
+**.pdf
+**.pdf
 inputs/cache/*
 
 **.log
-**.do
+# -- **.do -- need some of these
 **.dct

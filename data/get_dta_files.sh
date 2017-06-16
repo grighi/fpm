@@ -155,6 +155,8 @@ if [ ! -d dta ];
   then mkdir dta; 
 fi
 
+import glob
+datafiles = glob.glob('*dat')
 stata -b do init.do
 
 rm *_2000b.dat

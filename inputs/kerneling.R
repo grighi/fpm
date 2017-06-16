@@ -1,4 +1,4 @@
-#!/bin/Rscript
+#!/usr/bin/Rscript
 # This script resamples ASEC incomes to get income estimates in the monthly CPS. It 
 # does this separately for primary families and unrelated subfamilies.
 
@@ -214,7 +214,7 @@ earnings.poverty    <- sapply(split(earnings.poverty, grp), mean) %>% as.vector
 poverty          <- as.vector(unlist(feather::read_feather('../inputs/calculated_poverty.f')))
 official.poverty <- c(11.9, 11.3, 11.7, 12.1, 12.5, 12.7, 12.6, 12.3, 12.5, 13.2, 14.3, 15.1, 15, 15, 14.5, 14.8, 13.5)
 
-#png('../output.png')
+png('../output.png')
 ylim <- c(0.1, 0.35)  # for earnings poverty
 ylim <- c(0.1, 0.16)  # for simple FPM
 plot(stepfun(2000:2015, c(poverty)), ylab = 'poverty rate', xlab = 'year', 
@@ -229,7 +229,7 @@ polygon(c(time, rev(time))[-drop.end], edges[-drop.end], col = 'lightgray', bord
 lines(time, monthly.poverty, col = 'blue')
 lines(time, earnings.poverty, col = 'green')
 
-#dev.off()
+dev.off()
 
 # save outputs
 write_feather(data.frame(monthly.poverty), 'monthly.poverty.fthr')
