@@ -17,10 +17,15 @@ cat("Commencing R package installations.\n")
 packages <- c("data.table", "readstata13", "feather", "blsAPI", "rjson",
               "randomForest", "doMC", "magrittr", "plyr")
 
-repo     <- "http://cran.cnr.Berkeley.edu/"
+repo <- "http://cran.cnr.Berkeley.edu/"
 
-invisible(sapply(packages, function(pkg) install.packages(pkg, 
-                                                          repos = repo, 
-                                                          quiet = TRUE)))
+a <- available.packages(contriburl = contrib.url(repo))
+b <- installed.packages()
+
+invisible(
+  sapply(packages, function(pkg) {
+    if (a[pkg, 'Version'] != b[pkg, 'Version']) {
+      install.packages(pkg, repos = repo, quiet = T)}
+    }))
 
 cat("Package download complete.\n")

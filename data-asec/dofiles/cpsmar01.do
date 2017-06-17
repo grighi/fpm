@@ -4469,5 +4469,5 @@ label define cmsrvyna
 	1           "IMPUTED"                       
 ;
 
-save cpsmar01,replace;;;
+save cpsmar01,replace;
 #delimit cr

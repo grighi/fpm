@@ -4481,7 +4481,7 @@ label define purkatel
 	2           "Person not eligible for"       
 ;
 
-save cpsmar06,replace;;;
+save cpsmar06,replace;
 #delimit cr
 
 /*

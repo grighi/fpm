@@ -14,7 +14,7 @@ set mem 500m
    the complete path and name of the raw data file.
    On a PC, use backslashes in paths as in C:\  */   
 
-local dat_name cpsrwdec07.dat
+local dat_name "/homes/data/cps-basic/rwdec07.dat"
 
 /* The following line should contain the path to your output '.dta' file */
 

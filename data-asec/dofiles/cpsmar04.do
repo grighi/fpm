@@ -4465,7 +4465,7 @@ label define occup
 	0           "Not in universe or children"   
 ;
 
-save cpsmar04,replace;;;
+save cpsmar04,replace;
 #delimit cr
 
 /*

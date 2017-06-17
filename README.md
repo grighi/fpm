@@ -13,6 +13,18 @@ The project builds with bash, Stata, [git](https://git-for-windows.github.io/), 
 # from directory where you want to place the project:
 git clone https://github.com/grighi/fpm.git
 
+# pip should be in your python installation, but it needs upgrading. On Linux/mac OSX:
+pip install -U pip
+# or on windows:
+python -m pip install -U pip
+# note that if you had Python 2.7 on your computer you may need to run this all with "pip3" instead of "pip"
+
+# now with pip, install BeautifulSoup for downloading:
+pip install bs4
+
+# [user edits this!] add stata location to your path:
+export PATH=$PATH:/Applications/Stata/Stata.app/Contents/MacOS/Stata
+
 cd fpm
 ./portable_build.sh
 ```

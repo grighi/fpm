@@ -27,6 +27,8 @@ for link in soup.findAll('a'):
     if match:
         urls.append('http://www.nber.org' + link.get('href'))
 
+# drop the 2001 SCHIP file from downloaded files
+urls.remove('http://www.nber.org/cps/cpsmar2001.zip')
 
 zipped = []
 #def download(url):
@@ -151,12 +153,12 @@ for datafile in datafiles:
             line = re.sub('local dct.*dct', 'local dct_name '+ dct, line)
             # 2000-2002 do files need another edit:
             line = re.sub('(quietly infile using )(cpsmar[0-9]*)', 
-                          '\g<1>\g<2>.dct, using\(\g<2>.dat\)', line)
+                          '\g<1>\g<2>.dct, using(\g<2>.dat)', line)
             text.append(line)
     with open(reader, 'w') as readerlines:
         readerlines.writelines(text)
     
-    subprocess.run(['/Applications/Stata/Stata.app/Contents/MacOS/Stata', '-e', 'do', reader])
+    subprocess.run(['stata', '-e', 'do', reader])
 
 
 for file in glob.glob('*.dat'):
@@ -171,6 +173,9 @@ for file in glob.glob('*.dta'):
 os.makedirs('logs', exist_ok = True)
 for file in glob.glob('*.log'):
     os.rename(file, 'logs/'+file)
+for file in glob.glob('*.smcl'):
+    os.rename(file, 'logs/'+file)
+
 os.makedirs('dofiles', exist_ok = True)
 for file in glob.glob('*.do'):
     os.rename(file, 'dofiles/'+file)

@@ -347,7 +347,7 @@ note thprop_val: U H_TENURE = 1
 note i_propval: U H_HHTYPE = 1
 note hrnumwic: U H_HHTYPE = 1
 note tcare_val: U HFOODSP = 1
-note i_careval: U UÃÂÃÂ 	HRPAIDCC=1
+note i_careval: U UÂ 	HRPAIDCC=1
 note fh_seq: U All families
 note ffpos: U All families
 note fkind: U All families

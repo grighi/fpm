@@ -4649,7 +4649,7 @@ label define i_m5g3l
 	5           "County in New York City"       
 ;
 
-save cpsmar05,replace;;;
+save cpsmar05,replace;
 #delimit cr
 
 /*

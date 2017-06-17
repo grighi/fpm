@@ -13,15 +13,15 @@ log using cpsmar12.log, replace
    the complete path and name of the raw data file.
    On a PC, use backslashes in paths as in C:\  */   
 
-local dat_name "/homes/data/cps/cpsmar12.dat"
+local dat_name cpsmar12.dat
 
 /* The following line should contain the path to your output '.dta' file */
 
-local dta_name "/homes/data/cps/cpsmar12.dta"
+local dta_name cpsmar12.dta
 
 /* The following line should contain the path to the data dictionary file */
 
-local dct_name "cpsmar12.dct"
+local dct_name cpsmar12.dct
 
 quietly infile using "`dct_name'", using("`dat_name'") clear
 

@@ -8,7 +8,9 @@
 **.pdf
 **.Rhistory
 inputs/cache/*
+**/__pycache__/**
 
 **.log
-# -- **.do -- need some of these
+**.smcl
+# -- **.do -- need some of these like init.do
 **.dct

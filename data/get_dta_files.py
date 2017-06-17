@@ -9,6 +9,7 @@ for cross-platform compatibility
 import bs4
 from urllib.request import urlopen
 from urllib.request import urlretrieve
+from urllib.error import HTTPError
 #from multiprocessing.dummy import Pool # use threads for I/O bound tasks
 import re
 import zipfile
@@ -41,8 +42,12 @@ zipped = []
 # result = Pool(4).map(urlretrieve, urls) # use 4 threads to download files concurrently
 
 for url in urls:
-    local_filename, headers = urlretrieve(url, url2filename(url))
-    zipped.append(local_filename)
+    try:
+        local_filename, headers = urlretrieve(url, url2filename(url))
+        zipped.append(local_filename)
+    except HTTPError: 
+        print('could not find ' + url)
+        next
 
 datafiles = []
 for zip_path in zipped:
@@ -167,7 +172,7 @@ for datafile in datafiles:
     with open(reader, 'w') as readerlines:
         readerlines.writelines(text)
     
-    subprocess.run(['/Applications/Stata/Stata.app/Contents/MacOS/Stata', '-e', 'do', reader])
+    subprocess.run(['stata', '-e', 'do', reader])
 
 # in May 2017, should read 220 files
 
@@ -187,8 +192,7 @@ with open('cpsrwdec07.do', 'r') as reader:
 with open('cpsrwdec07.do', 'w') as reader:
     reader.writelines(text)
 
-subprocess.run(['/Applications/Stata/Stata.app/Contents/MacOS/Stata',
-                '-e', 'do', re.sub('zip', 'do', reweights)])
+subprocess.run(['stata', '-e', 'do', re.sub('zip', 'do', reweights)])
 
 # now get other revised weights
 os.chdir('new_weights_2000-2002')
@@ -206,15 +210,13 @@ datafiles = glob.glob('*.dat')
 for datafile in datafiles:
     os.chmod(datafile, 777)
 
-subprocess.run(['/Applications/Stata/Stata.app/Contents/MacOS/Stata',
-                '-e', 'do', 'init.do'])
+subprocess.run(['stata', '-e', 'do', 'init.do'])
     
 for datafile in datafiles:
     os.remove(datafile)
 
 os.chdir('..')
-subprocess.run(['/Applications/Stata/Stata.app/Contents/MacOS/Stata',
-                '-e', 'do', 'add_weights_monthly.do'])
+subprocess.run(['stata', '-e', 'do', 'add_weights_monthly.do'])
 
 # clean up
 for file in glob.glob('*.dat'):

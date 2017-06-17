@@ -4147,5 +4147,5 @@ label define i_nxtres
 	3           "Allocated from matrix"         
 ;
 
-save cpsmar2000 , replace;;;;
+save cpsmar2000 , replace;
 #delimit cr
