@@ -28,5 +28,6 @@ export PATH=$PATH:/Applications/Stata/Stata.app/Contents/MacOS/Stata
 cd fpm
 ./portable_build.sh
 ```
-
+#### Additions
+* Abadie and Imbens have [written](https://economics.mit.edu/files/13159) about a martingale representation of matching estimators of which one example is hot-deck imputation. Can we use this to justify that our estimate should converge?
 
