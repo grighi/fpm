@@ -5,6 +5,7 @@ python3 translation of script ot download dta files
 for cross-platform compatibility
 """
 
+# note: check for SSL certificates in OSX python3.6
 
 import bs4
 from urllib.request import urlopen
@@ -18,7 +19,11 @@ from url2filename import url2filename
 import subprocess
 import tarfile
 import glob
+import sys
 
+if 'darwin' in sys.platform:
+    print('Running \'caffeinate\' on MacOSX to prevent the system from sleeping')
+    subprocess.Popen('caffeinate')
 
 url = 'http://www.nber.org/data/cps_basic.html'
 html_page = urlopen(url)
@@ -32,7 +37,7 @@ for link in soup.findAll('a'):
     if match2:
         urls.append('http://www.nber.org' + link.get('href'))
     
-zipped = []
+zipped = [url2filename(url) for url in urls]
 #def download(url):
 #    local_filename, headers = urlretrieve(url, url2filename(url))
 #    zipped.append(local_filename)
@@ -41,12 +46,16 @@ zipped = []
     
 # result = Pool(4).map(urlretrieve, urls) # use 4 threads to download files concurrently
 
-for url in urls:
+while urls:
+    url = urls.pop(0)
     try:
-        local_filename, headers = urlretrieve(url, url2filename(url))
-        zipped.append(local_filename)
+        if url2filename(url) not in set(os.listdir()):
+            local_filename, headers = urlretrieve(url, url2filename(url))
+            zipped.append(local_filename)
+            #print('downloaded ' + url)
     except HTTPError: 
         print('could not find ' + url)
+        urls.append(url)
         next
 
 datafiles = []
@@ -59,6 +68,7 @@ for zip_path in zipped:
     zip_ref.close()
     os.remove(zip_path)
     datafiles.append(newname)
+    print('extracted ' + newname)
 
 
 # now get the associated dofiles
@@ -118,7 +128,6 @@ for dct in dcts:
 #    with open(do, 'w') as lines:
 #        lines.writelines(text)
 
-import glob
 datafiles = glob.glob('*dat')
 dtafiles = glob.glob('*dta')
 datafiles = [re.sub('dat', 'dta', x) for x in datafiles]
@@ -196,7 +205,7 @@ subprocess.run(['stata', '-e', 'do', re.sub('zip', 'do', reweights)])
 
 # now get other revised weights
 os.chdir('new_weights_2000-2002')
-url = 'http://thedataweb.rm.census.gov/pub/cps/basic/199801-/pubuse2000_2002.tar.zip'
+url = 'https://thedataweb.rm.census.gov/pub/cps/basic/199801-/pubuse2000_2002.tar.zip'
 urlretrieve(url, url2filename(url))
 with open('pubuse2000_2002.tar.zip', 'rb') as zipf:
     z = zipfile.ZipFile(zipf, 'r')
