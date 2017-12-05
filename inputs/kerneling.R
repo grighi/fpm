@@ -32,7 +32,7 @@ monthly.poverty <- foreach(yr = rep(years,1), .combine = 'comb') %dopar% {
   # get asec data
   asec.incomes <- data.frame(feather::read_feather(paste0('asec', asec.yr, 'sample.f')))
   names(asec.incomes) <- c('hufaminc', 'ftotval', 'famtyp', 'asec.h_faminc', 'nppl', 'nkid', 
-                           'wsalval', 'sempval', 'farmval')
+                           'wsalval', 'sempval', 'farmval', 'clswkr')
   asec.incomes <- data.table(asec.incomes)
   
   # create vector for this year 'yr'
@@ -134,29 +134,55 @@ monthly.poverty <- foreach(yr = rep(years,1), .combine = 'comb') %dopar% {
     groups[is.na(Ncps), Ncps := 0]
     asec.incomes[, N := .N, by = .(primaryFam, hufaminc, nppl, nkid)]
     asec.incomes[, GRP := .GRP, by = .(primaryFam, hufaminc, nppl, nkid)]
-    
+   
+    asec.incomes[!(clswkr %in% 5:6), c('wsalval', 'sempval', 'farmval') := NA]
+     
     # resample from asec.incomes to get means for CPS
     cps <- cps[!is.na(GRP)]
     setkey(cps, GRP)
     setkey(asec.incomes, GRP)
     means <- mapply(
-              function(x, m) {
-                # set.seed(32894+1)  # would need to change for-loop from being year-centered
-                x[sample(nrow(x), m, replace = T), .(ftotval, wsalval, sempval, farmval)]
-                },
-              x = split(asec.incomes, asec.incomes$GRP), 
-              m = groups$Ncps) %>% 
+      function(x, m) {
+        # set.seed(32894+1)  # would need to change for-loop from being year-centered
+        x[sample(nrow(x), m, replace = T), .(ftotval)]
+      },
+      x = split(asec.incomes, asec.incomes$GRP), 
+      m = groups$Ncps) %>% 
       t %>% 
       unlist
     # now get means of every category
-    means <- data.frame(split(means, sort(rep(1:4, nrow(cps)))))
-    names(means) <- c('inc', 'wsal', 'semp', 'farm')
-    cps$selfemp <- means$wsal + means$semp + means$farm      # alternative 1: add three self-employment sources
-    cps$selfemp <- pmax(means$wsal, means$semp, means$farm)  # alternative 2: (koji's choice) take max
-    cps$selfemp2 <- pmax(means$semp, means$farm)
+    cps$fincome <- rnorm(nrow(cps), means, sd = 500)
     
-    cps$fincome <- rnorm(nrow(cps), means$inc, sd = 500)
-    cps$selfemp <- rnorm(cps$selfemp, sd = 500)
+    # -----------------------------------------------> VERIFY THAT THIS IS WHAT KOJI DID, BUT IN GENERAL, WE WANT
+    # -----------------------------------------------  TO DRAW A SECOND SET OF SELF-EMPLOYMENT VALUES AND GIVE THESE
+    # --------------------------------------------- ONLY TO THE SELF EMPLOYED PEOPLE. THEN USE SE + EARN TO CALCULATE EARNINGS POVERTY
+    # now sample the self-employment earnings
+    # recalculate groups
+    # procedure: define groups and counts in ASEC; merge onto the CPS; get the needed number for each
+    # group in the CPS; bring this back onto groups
+    cps[, c('GRP', 'N') := NULL]
+    groups <- asec.incomes[clswkr %in% 5:6, .(.GRP, .N), by = .(primaryFam, hufaminc, nppl, nkid)]
+    cps <- merge(cps, groups, by = c('primaryFam', 'hufaminc', 'nppl', 'nkid'), all.x = T)
+    groups <- merge(groups, cps[se.status == T, .(Ncps = .N), by = GRP], by = 'GRP', all.x = T)
+    groups[is.na(Ncps), Ncps := 0]
+    count <- sum(groups$Ncps)  # count how many are in groups found in both CPS and ASEC
+    asec.incomes[, N := .N, by = .(primaryFam, hufaminc, nppl, nkid)]
+    asec.incomes[, GRP := .GRP, by = .(primaryFam, hufaminc, nppl, nkid)]
+    means <- mapply(
+      function(x, m) {
+        # set.seed(32894+1)  # would need to change for-loop from being year-centered
+        x[sample(nrow(x), m, replace = T), .(wsalval, sempval, farmval)]
+      },
+      x = split(asec.incomes[clswkr %in% 5:6], asec.incomes[clswkr %in% 5:6]$GRP), 
+      m = groups$Ncps) %>% 
+      t %>% 
+      unlist
+    means <- data.frame(split(means, sort(rep(1:3, count))))
+    names(means) <- c('wsal', 'semp', 'farm')
+    cps[, selfemp := NA]
+    # cps$selfemp <- means$wsal + means$semp + means$farm      # alternative 1: add three self-employment sources
+    cps[se.status == T & !is.na(GRP), selfemp := pmax(means$wsal, means$semp, means$farm)]  # alternative 2: (koji's choice) take max
+    cps[se.status == T & !is.na(GRP), selfemp := rnorm(selfemp, 500)]
     
     rm(means, groups)  # clean up
     
@@ -179,8 +205,8 @@ monthly.poverty <- foreach(yr = rep(years,1), .combine = 'comb') %dopar% {
     # cps[!is.na(selfemp), earnings := as.double(selfemp)]
     
     # IIc. add in only non-wage self-employment
-    cps[!is.na(earn) & !is.na(selfemp), earnings := earn*50 + selfemp2]
-    cps[ is.na(earn) & !is.na(selfemp), earnings := selfemp]
+    cps[se.status == T, earnings := earn*50 + as.double(selfemp)*50]
+    # cps[ is.na(earn) & !is.na(selfemp), earnings := selfemp]
     
     # earnings by family
     cps[, earnings := sum(earnings, na.rm = T), by = .(h_seq, fid)]
@@ -226,6 +252,7 @@ time  <- seq(1999, 2017, length.out = 217)[1:length(monthly.poverty)]
 edges <- c(monthly.poverty + 2*monthly.poverty.sd, rev(monthly.poverty - 2*monthly.poverty.sd))
 drop.end <- which(is.na(edges))
 polygon(c(time, rev(time))[-drop.end], edges[-drop.end], col = 'lightgray', border = F)
+# rgb(211,211,211,0.1, maxColorValue=255)
 lines(time, monthly.poverty, col = 'blue')
 lines(time, earnings.poverty, col = 'green')
 
@@ -235,7 +262,40 @@ dev.off()
 write_feather(data.frame(monthly.poverty), 'monthly.poverty.fthr')
 write_feather(data.frame(monthly.poverty.sd), 'monthly.poverty.sd.fthr')
 
+write_feather(data.frame(earnings.poverty), 'earnings.poverty.fthr')
+write_feather(data.frame(earnings.poverty.sd), 'earnings.poverty.sd.fthr')
+
 # # or, for fun:
 # zoo::rollmean(monthly.poverty, 12) %>%
 # lines(seq(1999, 2017, length.out = 217)[6:198], ., type = 'l', col = 'green')
+
+
+# --------------------------- DEPRACATED
+
+### the following code resamples family incomes and self employment incomes at the same time
+# # resample from asec.incomes to get means for CPS
+# cps <- cps[!is.na(GRP)]
+# setkey(cps, GRP)
+# setkey(asec.incomes, GRP)
+# means <- mapply(
+#   function(x, m) {
+#     # set.seed(32894+1)  # would need to change for-loop from being year-centered
+#     x[sample(nrow(x), m, replace = T), .(ftotval, wsalval, sempval, farmval)]
+#   },
+#   x = split(asec.incomes, asec.incomes$GRP), 
+#   m = groups$Ncps) %>% 
+#   t %>% 
+#   unlist
+# # now get means of every category
+# means <- data.frame(split(means, sort(rep(1:4, nrow(cps)))))
+# names(means) <- c('inc', 'wsal', 'semp', 'farm')
+# cps$selfemp <- means$wsal + means$semp + means$farm      # alternative 1: add three self-employment sources
+# cps$selfemp <- pmax(means$wsal, means$semp, means$farm)  # alternative 2: (koji's choice) take max
+# cps$selfemp2 <- pmax(means$semp, means$farm)
+# 
+# cps$fincome <- rnorm(nrow(cps), means$inc, sd = 500)
+# cps$selfemp <- rnorm(cps$selfemp, sd = 500)
+
+
+
 

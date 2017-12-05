@@ -26,7 +26,7 @@ for (yr in 2000:2016) {
     names(asec)[grep('hefaminc', names(asec))] <- 'h_faminc'
     
     asec <- asec[, .(h_idnum, a_lineno, ftype, ffpos, h_faminc, ftotval, fh_seq, ptotval, a_age, 
-                     h_hhtype, perrp, wsal_val, semp_val, frse_val, a_fnlwgt)] 
+                     h_hhtype, perrp, wsal_val, semp_val, frse_val, a_fnlwgt, a_clswkr)] 
     setnames(asec, 3:5, paste0('asec.', c('ftype', 'ffpos', 'h_faminc')))
     asec[, id := paste(h_idnum, a_lineno)]
     # asec[, h_idnum := NULL]
@@ -40,7 +40,7 @@ for (yr in 2000:2016) {
     asec[, ftotval := sum(ptotval), by = .(fh_seq, fid)]
     
     asec <- asec[, .(h_idnum,  a_lineno, asec.h_faminc, h_hhtype, asec.ftype, asec.ffpos, a_age, 
-                     perrp, wsal_val, semp_val, frse_val, a_fnlwgt, ftotval)]
+                     perrp, wsal_val, semp_val, frse_val, a_fnlwgt, ftotval, a_clswkr)]
     
     
     # calculate nppl to add to output -- this is modified from kerneling.R
@@ -72,7 +72,7 @@ for (yr in 2000:2016) {
       names(asec)[grep('faminc', names(asec))] <- 'h_faminc'
     }
     asec <- asec[, .(h_idnum, a_lineno, ftype, ffpos, h_faminc, ftotval, fh_seq, ptotval, a_age, 
-                     h_hhtype, perrp, wsal_val, semp_val, frse_val, a_fnlwgt)] 
+                     h_hhtype, perrp, wsal_val, semp_val, frse_val, a_fnlwgt, a_clswkr)] 
     setnames(asec, 3:5, paste0('asec.', c('ftype', 'ffpos', 'h_faminc')))
     asec[, id := paste(h_idnum, a_lineno)]
     # asec[, h_idnum := NULL]
@@ -88,7 +88,7 @@ for (yr in 2000:2016) {
     asec[, ftotval := sum(ptotval), by = .(fh_seq, fid)]
     
     asec <- asec[, .(h_idnum,  a_lineno, asec.h_faminc, h_hhtype, asec.ftype, asec.ffpos, a_age, 
-                     perrp, wsal_val, semp_val, frse_val, a_fnlwgt, ftotval)]
+                     perrp, wsal_val, semp_val, frse_val, a_fnlwgt, ftotval, a_clswkr)]
     
     # calculate nppl to add to output -- this is modified from kerneling.R
     asec[, h_seq := .GRP, by = h_idnum]
@@ -121,7 +121,7 @@ for (yr in 2000:2016) {
   # save feather with hufaminc and ftotval for kernel drawing
   filename <- paste0('../data-intermediate/asec', yr, 'sample.f')
   #cps[hufaminc == -1, hufaminc := NA]
-  feather::write_feather(asec[, .(asec.h_faminc, ftotval, asec.ftype, asec.h_faminc, nppl, nkid, wsal_val, semp_val, frse_val)], filename)
+  feather::write_feather(asec[, .(asec.h_faminc, ftotval, asec.ftype, asec.h_faminc, nppl, nkid, wsal_val, semp_val, frse_val, a_clswkr)], filename)
   
   rm(asec)
 }

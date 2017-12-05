@@ -92,6 +92,7 @@ do
   fi
 done
 
+rm cpsmar2001.dat
 
 # convert to stata
 i=1;
@@ -128,26 +129,5 @@ done;
 #tar -xzvf pubuse2000_2002.tar.zip
 ## a couple files need write permissions
 #chmod +w *_2000b.dat 
-
-# clean up
-
-if [ ! -d logs ]; 
-  then mkdir logs; 
-fi
-mv *.log logs/
-
-if [ ! -d dofiles ]; 
-  then mkdir dofiles; 
-fi
-mv *.{do,dct} dofiles/
-
-rm {*.smcl,*.zip,*.zip.*,*.dat}
-
-rename cpsmar20 cpsmar *
-
-mv cpsmar* ../inputs
-
-
-
 
 

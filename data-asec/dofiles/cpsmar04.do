@@ -271,7 +271,7 @@ replace  fhousreq =  fhousreq[_n-1]  if  precord==3
 replace hrecord = 1
 keep if precord==3
 
-*Everything below this point, aside from the final save, are value labels
+*Everything below this point, aside from the final save, are value labels;
 
 #delimit ;
 

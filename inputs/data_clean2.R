@@ -45,14 +45,18 @@ foreach(yr = 2000:2016) %dopar% {
     if (yr >= 2005)
       cps$hrhhid <- paste0(cps$hrhhid, cps$hrhhid2)
     # rename earnings
+    if (yr < 2003)
+      names(cps)[grep('pternwa', names(cps))] <- 'earn'
     names(cps)[grep('prernwa', names(cps))] <- 'earn'
     cps[is.na(peern), peern := 0]  # 'overtime earnings'
     cps[is.na(puern2), puern2 := 0]  # 'second overtimes earnings'
     cps[, earn := earn + peern + puern2]  # add in two measures of overtime
+    # keep self-employment status
+    cps[, se.status := (peio1cow %in% 6:7)]
     
     # select relevant variables
     cps <- cps[, .(hrhhid, hrmis, pulineno, hufaminc, hrhtype, prfamtyp, 
-                   prfamnum, peage, perrp, pemlr, earn, weight.fn)]
+                   prfamnum, peage, perrp, pemlr, earn, weight.fn, se.status)]
     
     # save file for year/month
     filename <- paste0('../data-intermediate/cps', substr(yr, 3,4), month.abb[mo], '.rds')
