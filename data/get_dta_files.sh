@@ -23,7 +23,7 @@ curl http://www.nber.org/data/cps_basic.html |
 N;N;N;N;N;N;N;N; N; N; N; N; N; N; N; N; N; N; N; N; N; N; N; N; N;
 s/<!--.*-->// }' | 
   grep -i href | 
-  egrep "[0-2][0-9]r?pub.zip" | 
+  egrep "17r?pub.zip" | 
   grep -o "/cps-basic/.*.zip" |
    while read line
   do
@@ -36,7 +36,7 @@ curl http://www.nber.org/data/cps_basic.html |
 N;N;N;N;N;N;N;N; N; N; N; N; N; N; N; N; N; N; N; N; N; N; N; N; N;
 s/<!--.*-->// }' | 
   grep -i href | 
-  egrep "99r?pub.zip" | 
+  egrep "17r?pub.zip" | 
   grep -o "/cps-basic/.*.zip" |
    while read line
   do

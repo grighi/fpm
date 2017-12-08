@@ -7,19 +7,19 @@ library(feather)
 
 #setwd('~/Documents/fpm/inputs')
 
-files <- c(paste0('../data-asec/dta/cpsmar', sprintf('%0.2i', 00:16), '.dta'))
+files <- c(paste0('../data-asec/dta/cpsmar', sprintf('%0.2i', 00:99), '.dta'))
 
 mo <- 3
 
 # to do: check all files in data-asec with "Stata ready CPS march supp blabla"
 # migrate to using only those files
 
-for (yr in 2000:2016) {
+for (yr in 2017) {
   message(paste(yr, 'Month', mo))
   index <- yr - 1999
 
   if (yr >= 2013) {
-    asec <- read.dta13(paste0('../data-asec/', files[index]), convert.factors = F)
+    asec <- read.dta13(files[index], convert.factors = F)
     asec <- data.table(asec)
     
     asec$h_idnum <- paste0(asec$h_idnum1, asec$h_idnum2)

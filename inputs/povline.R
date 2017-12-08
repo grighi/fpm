@@ -11,24 +11,25 @@ library(magrittr)
 source('thresholds.R')
 
 # datafiles names
-files <- paste0('../data-asec/dta/cpsmar', sprintf(0:16, fmt = '%0.2i'), '.dta')
+files <- paste0('../data-asec/dta/cpsmar', sprintf(0:99, fmt = '%0.2i'), '.dta')
 
 poverty <- vector(length = 16)
-for (yr in 1999:2015) {
+for (yr in 1999:2016) {
   message(yr)
   
-  rewrite <- T
+  rewrite <- F
   
-  # asec gives OPM of previous year
-  i <- yr - 1999 + 1
-  if (rewrite){  
+  cached <- paste0('cache/asec', substr(yr,3,4))
+  i <- yr - 1999 + 1  # poverty calculating uses subsequent ASEC
+  if (rewrite | !file.exists(cached)){  
     asec <- read.dta13(files[i],
-                     convert.factors = F)
+                       convert.factors = F)
     if ("./cache" %!in% list.dirs()) dir.create('cache')
-    saveRDS(asec, paste0('cache/asec', substr(yr,3,4)))
-    } else {
-  asec <- readRDS(paste0('cache/asec', substr(yr,3,4))) }
-
+    saveRDS(asec, cached)
+  } else {
+    asec <- readRDS(cached) 
+  }
+  
   attr.asec <- attributes(asec)
   names(attr.asec$var.labels) <- names(asec)
   asec <- data.table(asec)
@@ -84,11 +85,11 @@ for (yr in 1999:2015) {
 feather::write_feather(data.frame(poverty), 'calculated_poverty.f')
 poverty <- as.vector(unlist(feather::read_feather('calculated_poverty.f')))
 
-official.poverty <- c(11.9, 11.3, 11.7, 12.1, 12.5, 12.7, 12.6, 12.3, 12.5, 13.2, 14.3, 15.1, 15, 15, 14.5, 14.8, 13.5)
+official.poverty <- c(11.9, 11.3, 11.7, 12.1, 12.5, 12.7, 12.6, 12.3, 12.5, 13.2, 14.3, 15.1, 15, 15, 14.5, 14.8, 13.5, 12.7)
 
-plot(1999:2015, poverty, ylab = 'poverty rate', xlab = 'year', 
+plot(1998 + seq_along(poverty), poverty, ylab = 'poverty rate', xlab = 'year', 
      ylim = c(0.1, 0.16), type = 'o')
-lines(1999:2015, official.poverty / 100, col = 'red')
+lines(1998 + seq_along(official.poverty), official.poverty / 100, col = 'red')
 
 rm(asec, OPM, rawOPM, attr.asec, files, i, index, rewrite, tm, yr)
 

@@ -19,7 +19,7 @@ foreach yr in 00 01 02 {
 		drop _merge
 
 		compress
-		save "dta/cps`month'`yr'", replace
+		save "dta/cps`month'`yr'", replace;
 
 		label drop _all
 }
@@ -27,3 +27,4 @@ foreach yr in 00 01 02 {
 
 
 
+#delimit cr
