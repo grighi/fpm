@@ -4,8 +4,9 @@ This repository contains code for a monthly US Frequent Poverty Measure based on
 
 It is the product of some work by contributors at the Stanford Center on Poverty and Inequality including Koji Chavez, Charles Varner, Marybeth Mattingly, and Giovanni Righi. 
 
-![fpm](https://github.com/grighi/fpm/output_100.png "most recent version")
-
+<div style="text-align:center">
+![](https://raw.githubusercontent.com/grighi/fpm/master/output_100.png "most recent version")
+</div>
 
 ### Building
 
