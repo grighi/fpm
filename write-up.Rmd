@@ -1,0 +1,24 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+
+## Methods
+
+Earnings poverty and the number of children in nonworking families are identified from the basic monthly CPS. The standard questionnaire includes questions about usual weekly earnings and whether each adult in the household is working. However, it omits self-employment earnings, which are a major source of individual earnings (is this true? why were self-employment earnings added back in?). These are estimated using a new imputation method. Individuals are then grouped into poverty units to compare household data with poverty thresholds. Related subfamilies are in the same poverty unit as the primary family; other families are not.  
+
+###  Earnings Poverty
+
+Imputed self-employment earnings are added to reported usual weekly earnings because self-employment earnings are available in the Annual Social and Economic Supplement (ASEC) but not in the basic monthly CPS. This addition affects earnings poverty rates by several percentage points. To impute self-employment earnings, we pull self-employment earnings from records in the ASEC of the same year. By matching groups identified by family income category, primary family status, number of children and number of adults in the household, we nonparametrically estimate self-employment earnings for individuals responding to the basic monthly CPS. Wage and salary, self-employment, and farm earnings values are drawn randomly with replacement from a group in the ASEC and assigned to the corresponding group in the basic CPS. The maximum of the three values is assigned as self-employment earnings and a small bandwidth is added. Imputed self-employment earnings are added to usual weekly earnings for individuals that report being self-employed, and total earnings are then multiplied by fifty to estimate annual earnings (assuming two weeks of vacation). These values are compared to poverty thresholds.
+
+![Earnings poverty.](output2.pdf)
+
+### Children in Non-Working Families
+
+We count the proportion of children living in households where no eligible adults are working. Individuals are defined as eligible to work if they are older than 14, not disabled, retired, or otherwise not in the labor force (NILF). Workers that are NILF for an unspecified reason or that want to work and that are not disabled are left in the labor force.
+
+![Children in non-working families overlayed with official poverty measure.](output3.pdf)
+
+
+
