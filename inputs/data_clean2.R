@@ -17,7 +17,7 @@ library(doParallel)
 registerDoParallel(4)
 
 # tmp <- list()
-foreach(yr = 2017, .errorhandling = 'pass') %dopar% {
+foreach(yr = 2017, .errorhandling = 'pass') %do% {
   # on.exit(registerDoSEQ())
   
    for (mo in 1:12) {

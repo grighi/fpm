@@ -14,15 +14,15 @@ set mem 500m
    the complete path and name of the raw data file.
    On a PC, use backslashes in paths as in C:\  */   
 
-local dat_name cpsapr09.dat
+local dat_name "/homes/data/cps-basic/cpsb0901.dat"
 
 /* The following line should contain the path to your output '.dta' file */
 
-local dta_name cpsapr09.dta
+local dta_name "cpsb2009_1.dta"
 
 /* The following line should contain the path to the data dictionary file */
 
-local dct_name cpsbjan09.dct
+local dct_name "cpsbjan09.dct"
 
 /* The line below does NOT need to be changed */
 

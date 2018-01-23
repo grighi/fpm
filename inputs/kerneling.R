@@ -40,10 +40,10 @@ st <- system.time({
     
     mos <- 1:12
     if(year(Sys.time()) - 1 == yr) {
-      list.files(pattern = paste0('cps', substr(yr2,3,4), '.*')) %>% 
+      list.files(pattern = paste0('cps', substr(yr+1,3,4), '.*')) %>% 
         substr(6,8) %>% 
         match(month.abb) %>%  
-        max -> mos
+        max %>% seq -> mos
     }
     # fill up vector for year 'yr'
     for (mo in mos) {
@@ -73,11 +73,12 @@ st <- system.time({
       
       filename <- paste0('cps', substr(yr2,3,4), month.abb[mo2], '.rds')
       cps <- data.table(readRDS(filename))
-      
-      cps <- cps[hrhtype %in% 1:8, ]  # no group quarters
-      
+      # note that subsequent cleaning steps use data.table syntax
+
+      cps <- cps[hrhtype %in% 1:8, ]  # no group quarters      
+
       # !! -- this is the bulk of this project -- !!
-      # it is hard and necessary to have a good conversion between CPS and ASEC income categories
+      # edit CPS income categories to conform with ASEC categories
       if (cps.yr %in% 2000:2001) {
         # cps[hufaminc %in% -3:-1, hufaminc := -1]
         cps[hufaminc > 0, hufaminc := hufaminc - 1L]
@@ -85,11 +86,11 @@ st <- system.time({
         cps[hufaminc %in% -3:-1, hufaminc := 1]
         cps[hufaminc > 0, hufaminc := hufaminc - 1L]
         cps$hufaminc <- plyr::mapvalues(cps$hufaminc, 14:15, c(13,13), warn_missing = F)
-      } else if (cps.yr %in% 2005:2009) {
+      } else if (cps.yr %in% 2005:2016) {
         # nada
       }
       
-      # the following data cleaning steps use the data.table syntax
+      # create household and family identifiers that will identify a poverty unit
       cps[, h_seq := .GRP, by = hrhhid]  # repurpose variable h_seq into shorter ID
       cps[prfamtyp == 3, ftype := 1L]    # move related subfamilies into primary family
       cps[prfamtyp != 3, ftype := as.integer(prfamtyp)]
@@ -98,7 +99,7 @@ st <- system.time({
       cps[is.na(fid), fid := -1]
       cps[ftype == 5, fid := fid + 1:.N, by = .(h_seq)]
       
-      # count types of people in family
+      # count adults and kids to identify relevant poverty threshold
       cps[, nkid := sum(peage < 18), by = .(h_seq, fid)]
       cps[nkid > 8, nkid := 8]
       
@@ -108,7 +109,7 @@ st <- system.time({
       cps[ftype %in% 1:3, hhage := as.integer(max(hhage, na.rm = T)), by = h_seq]   # give others that hhage
       cps[ftype > 3, hhage := as.integer(max(peage)), by = .(h_seq, fid)]           # unrelated subfamilies get oldest in family
       
-      # adjust nppl accordingly
+      # adjust nppl to match thresholds
       cps[hhage <  65 & nppl == 3, nppl := 1]
       cps[hhage >= 65 & nppl == 3, nppl := 2]
       cps[hhage <  65 & nppl == 4, nppl := 3]
@@ -116,6 +117,7 @@ st <- system.time({
       
       cps[nppl > 11, nppl := 11]
       
+      # merge on poverty thresholds
       OPM <- matrix(off.thr(index - 12)$ouThresh, nrow = 11, byrow = T)  # turn threshold into matrix
       cps[, threshold := OPM[cps$nkid*11 + cps$nppl]]
       
@@ -124,11 +126,8 @@ st <- system.time({
       cps[prfamtyp %in% 4:5, primaryFam := 0]
       asec.incomes$primaryFam <- plyr::mapvalues(asec.incomes$famtyp, from = 1:5, to = c(1,1,1,0,0))
       
-      # restrict family sizes for income donation (safe since threshold already assigned)
-      # this could be optimized. right now it only cuts off nppl and nikds. alternatively:
-      # - after creating the group matrix, call diff()
-      # - the first row with diff()>1 gives the maximum family sizes using the original
-      #   grouping matrix
+      # since there are small samples of large families in the ASEC for highest poverty categories
+      # we cut off the max family sizes for the income resampling
       asec.incomes[nppl > 4, nppl := 4]
       cps[nppl > 4, nppl := 4]
       asec.incomes[nkid > 2, nkid := 2]
@@ -247,9 +246,9 @@ st <- system.time({
       # cps[nw == 1, mean(povstatus, na.rm = T)]
       
       # ----> poverty with earnings should be ~32%, drop to ~27% with self-employment earnings
-      cps[, povstatus := as.numeric(fincome < threshold)]
+      cps[, povstatus := fincome < threshold]
       cps[, c('earnpov') := NA]
-      cps[, earnpov := as.numeric(earnings < threshold)]
+      cps[, earnpov := earnings < threshold]
       
       # # ----> this check can be used to compare our output with monthlyCPS_00_1_Cleaned.dta
       # '../../fpm/modifDat/monthlyCPS_01_3_Cleaned.dta' %>%
@@ -278,7 +277,7 @@ st <- system.time({
       monthly.poverty.yr[[1]][mo] <- weighted.mean(cps$povstatus, cps$weight.fn, na.rm = T) 
       # one alternative is to use [hrmis %in% c(1,5)] for income poverty
       monthly.poverty.yr[[2]][mo] <- weighted.mean(cps$earnpov, cps$weight.or, na.rm = T) 
-      monthly.poverty.yr[[3]][mo] <- cps[nw == 1 & peage < 18 & hufaminc > 0, weighted.mean(povstatus, weight.fn, na.rm = T)]
+      monthly.poverty.yr[[3]][mo] <- cps[peage < 18 & hufaminc > 0, weighted.mean(nw, weight.fn, na.rm = T)]
      
       if(year(Sys.time()) - 1 == yr) {
        monthly.poverty.yr <- lapply(monthly.poverty.yr, function(x) x[x>0])
@@ -312,41 +311,47 @@ official.poverty <- c(11.9, 11.3, 11.7, 12.1, 12.5, 12.7, 12.6, 12.3, 12.5, 13.2
 
 png('../output.png')
 ylim <- c(0.1, 0.16)  # for simple FPM
-plot(stepfun(2000:2016, poverty), ylab = 'poverty rate', xlab = 'year', 
+plot(c(0,0), ylab = 'poverty rate', xlab = 'year', 
      ylim = ylim, xlim = c(1998, 2018), main = 'frequent poverty rate')
+rug(x = c(years, 2017, 2018), ticksize = 1, side = 1, col = 'gray', lty = 2)
+lines(stepfun(2000:2016, poverty))
 lines(stepfun(2000:2016, official.poverty / 100), col = 'red')
 
 # draw gray boundary that is 2*(standard deviation) from mean of simulation
-time  <- seq(1999, 2017, length.out = 217)[1:length(monthly.poverty)]
+time  <- seq(1999, 2017, length.out = length(monthly.poverty)+1)[1:length(monthly.poverty)] + .04
 edges <- c(monthly.poverty + 2*monthly.poverty.sd, rev(monthly.poverty - 2*monthly.poverty.sd))
 drop.end <- which(is.na(edges))
 polygon(c(time, rev(time))[-drop.end], edges[-drop.end], col = 'lightgray', border = F)
 # rgb(211,211,211,0.1, maxColorValue=255)
-lines(time+.5, monthly.poverty, col = 'blue')
+lines(time + .5, monthly.poverty, col = 'blue')
 dev.off()
 
-png('../output2.png')
+pdf('../output2.pdf')
 ylim <- c(0.25, 0.35)  # for earnings poverty
-plot(stepfun(2000:2016, c(poverty)), ylab = 'poverty rate', xlab = 'year', 
+plot(c(0,0), ylab = 'poverty rate', xlab = 'year', 
      ylim = ylim, xlim = c(1998, 2018), main = 'frequent earnings poverty rate')
+rug(x = c(years, 2017, 2018), ticksize = 1, side = 1, col = 'gray', lty = 2)
+lines(stepfun(2000:2016, c(poverty)))
 # draw gray boundary that is 2*(standard deviation) from mean of simulation
 time  <- seq(1999, 2017, length.out = 217)[1:length(monthly.poverty)]
 edges <- c(earnings.poverty + 2*earnings.poverty.sd, rev(earnings.poverty - 2*earnings.poverty.sd))
 drop.end <- which(is.na(edges))
 polygon(c(time, rev(time))[-drop.end], edges[-drop.end], col = 'lightgray', border = F)
 # rgb(211,211,211,0.1, maxColorValue=255)
-lines(time, earnings.poverty, col = 'darkgreen')
+lines(time+1, earnings.poverty, col = 'darkgreen')
 dev.off()
 
-png('../output3.png')
-ylim <- c(0.3, 0.6)  # for nonworking children poverty
-plot(stepfun(2000:2016, c(poverty)), ylab = 'poverty rate', xlab = 'year', 
-     ylim = ylim, xlim = c(1998, 2018), main = 'children in nonworking families fpm')
+pdf('../output3.pdf')
+ylim <- c(0, 0.16)  # for nonworking children poverty
+plot(c(0,0), ylab = 'poverty rate', xlab = 'year', 
+     ylim = ylim, xlim = c(1998, 2018), main = 'children in nonworking families')
+rug(x = c(years, 2017, 2018), ticksize = 1, side = 1, col = 'gray', lty = 2)
+lines(stepfun(2000:2016, poverty))
 time  <- seq(1999, 2017, length.out = 217)[1:length(monthly.poverty)]
 edges <- c(children.nw.poverty + 2*children.nw.poverty.sd, rev(children.nw.poverty - 2*children.nw.poverty.sd))
 drop.end <- which(is.na(edges))
 polygon(c(time, rev(time))[-drop.end], edges[-drop.end], col = 'lightgray', border = F)
-lines(time, children.nw.poverty, col = 'coral4')
+lines(time+1, children.nw.poverty, col = 'coral4')
 dev.off()
 
 
@@ -358,13 +363,21 @@ write_feather(data.frame(monthly.poverty.sd), 'monthly.poverty.sd.fthr')
 write_feather(data.frame(earnings.poverty), 'earnings.poverty.fthr')
 write_feather(data.frame(earnings.poverty.sd), 'earnings.poverty.sd.fthr')
 
-write_feather(data.frame(children.nw.poverty), 'earnings.poverty.fthr')
-write_feather(data.frame(children.nw.poverty.sd), 'earnings.poverty.sd.fthr')
+write_feather(data.frame(children.nw.poverty), 'children.nw.poverty.fthr')
+write_feather(data.frame(children.nw.poverty.sd), 'children.nw.poverty.sd.fthr')
 
 # # or, for fun:
 # zoo::rollmean(monthly.poverty, 12) %>%
 # lines(seq(1999, 2017, length.out = 217)[6:198], ., type = 'l', col = 'green')
 
+monthly.poverty        <- unlist(read_feather('monthly.poverty.fthr'))
+monthly.poverty.sd     <- unlist(read_feather('monthly.poverty.sd.fthr'))
+
+earnings.poverty       <- unlist(read_feather('earnings.poverty.fthr'))
+earnings.poverty.sd    <- unlist(read_feather('earnings.poverty.sd.fthr'))
+
+children.nw.poverty    <- unlist(read_feather('children.nw.poverty.fthr'))
+children.nw.poverty.sd <- unlist(read_feather('children.nw.poverty.sd.fthr'))
 
 # --------------------------- DEPRACATED
 

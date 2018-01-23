@@ -14,15 +14,15 @@ capture set mem 500m
    the complete path and name of the raw data file.
    On a PC, use backslashes in paths as in C:\  */   
 
-local dat_name cpsapr13.dat
+local dat_name "/homes/data/cps-basic/jan13pub.dat"
 
 /* The following line should contain the path to your output '.dta' file */
 
-local dta_name cpsapr13.dta
+local dta_name "cpsb2013_1.dta"
 
 /* The following line should contain the path to the data dictionary file */
 
-local dct_name cpsbjan13.dct
+local dct_name "cpsbjan13.dct"
 
 /* The line below does NOT need to be changed */
 
