@@ -298,6 +298,7 @@ datafiles = glob.glob('*.dat')
 for datafile in datafiles:
     os.chmod(datafile, 777)
 
+# TO DO: is the following really necessary if not doing reweights?
 subprocess.run(['stata', '-e', 'do', 'init.do'])
     
 for datafile in datafiles:

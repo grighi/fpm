@@ -11,6 +11,9 @@
 inputs/cache/*
 **/__pycache__/**
 **.zip
+**.docx
+**.html
+**.xlsx
 
 **.log
 **.smcl
