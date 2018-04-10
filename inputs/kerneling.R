@@ -321,7 +321,7 @@ lines(stepfun(2000:2016, official.poverty / 100), col = 'red')
 time  <- seq(1999, 2017, length.out = length(monthly.poverty)+1)[1:length(monthly.poverty)] + .04
 edges <- c(monthly.poverty + 2*monthly.poverty.sd, rev(monthly.poverty - 2*monthly.poverty.sd))
 drop.end <- which(is.na(edges))
-polygon(c(time, rev(time))[-drop.end], edges[-drop.end], col = 'lightgray', border = F)
+polygon(c(time+.5, rev(time+.5))[-drop.end], edges[-drop.end], col = 'lightgray', border = F)
 # rgb(211,211,211,0.1, maxColorValue=255)
 lines(time + .5, monthly.poverty, col = 'blue')
 dev.off()
