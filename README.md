@@ -10,25 +10,16 @@ It is the product of some work by contributors at the Stanford Center on Poverty
 
 ### Building
 
-The project builds with bash, Stata, [git](https://git-for-windows.github.io/), [Python3.6](https://www.python.org/downloads/), and [R](https://cran.r-project.org/doc/FAQ/R-FAQ.html#How-can-R-be-installed_003f). From a Unix shell:
+To build the project, make sure you have all the necessary software (Stata, [git](https://git-for-windows.github.io/), [Python3.6](https://www.python.org/downloads/), and [R](https://cran.r-project.org/doc/FAQ/R-FAQ.html#How-can-R-be-installed_003f)) and open a shell:
 
 ```
 # from directory where you want to place the project:
 git clone https://github.com/grighi/fpm.git
 
-# pip should be in your python installation, but it needs upgrading. On Linux/mac OSX:
-pip install -U pip
-# or on windows:
-python -m pip install -U pip
-# note that if you had Python 2.7 on your computer you may need to run this all with "pip3" instead of "pip"
-
-# now with pip, install BeautifulSoup for downloading:
-pip install bs4
-
-# [user edits this!] add stata location to your path:
+# make sure Stata is installed and on your path, something like:
 export PATH=$PATH:/Applications/Stata/Stata.app/Contents/MacOS/Stata
 
-# you may need to edit the shell script to get it to work on your machine:
+# run the build script
 cd fpm
 ./linux_build.sh
 ```

@@ -1,4 +1,9 @@
 
+# you may want to upgrade pip and install some packages
+# pip install -U pip
+# pip install bs4
+# pip install pandas
+
 # get asec data
 cd data-asec
 # bash get_asec_dta.sh
