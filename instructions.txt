@@ -1,0 +1,33 @@
+
+1. In General
+
+This project calculates a frequent poverty measure by pulling down the Curren Population Survey (CPS) basic monthly data and CPS annual social and economic supplement (ASEC), which is the addition to the CPS for every March. The basic CPS is asked every month, but it does not contain detailed incomes - it only sorts respondents into ten income categories. The ASEC asks about income categories and detailed incomes, but it is only asked in March. We find a mapping from categories to detailed income using the ASEC for every year, and we apply it to the CPS data for every month in that year. This means that the project needs to pull the relevant data, manipulate it, and create three figures: frequent poverty, earnings poverty, and poverty of children in nonworking families.
+
+To do this, it relies on several pieces of software. You need to download and install Stata, git, R, and python 3.6. The build script is currently written for a unix-like machine (linux or Mac), but a similar build script could be written for Windows (one option is to write a build script in python). These instructions assume you'll use a unix-like environment.
+
+
+2. Folders
+
+* `data` will be the folder where CPS basic monthly data is downloaded and opened
+* `data-asec` will do the same with the ASEC supplements
+* `data-intermediate` is the space where data will be kept over the course of manipulations for this project
+* the build script and figures are kept in the parent directory
+
+3. Replication instructions (MONTHLY)
+
+The code is made to self-document and reproduce easily. Open a terminal, navigate to your working directory, and:
+
+```
+git clone https://github.com/grighi/fpm.git
+
+cd fpm 
+./linux_build.sh
+```
+
+Every month, you will need to rerun linux_build.sh or your build script. This should download new monthly data and update the figures accordingly.
+
+4. Seasonal Adjustment
+
+This is not currently implemented, but a basic.spc file is included to seasonally adjust the data with x13as. This is BLS software that can be downloaded from the web.
+
+
