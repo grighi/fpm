@@ -7,12 +7,12 @@
 # get asec data
 cd data-asec
 # bash get_asec_dta.sh
-python get_asec_dta.py
+python3 get_asec_dta.py
 
 # get monthly data
 cd ../data
 # bash get_dta_files.sh
-python get_dta_files.py
+python3 get_dta_files.py
 
 # play with data
 cd ../inputs
