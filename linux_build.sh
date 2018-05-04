@@ -12,7 +12,7 @@ python get_asec_dta.py
 # get monthly data
 cd ../data
 # bash get_dta_files.sh
-ptyon get_dta_files.py
+python get_dta_files.py
 
 # play with data
 cd ../inputs
