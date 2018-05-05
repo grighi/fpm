@@ -1,4 +1,4 @@
-#!/usr/bin/Rscript
+#!/usr/local/bin/Rscript
 # This pulls the relevant information from the various CPS to create slimmer datasets
 
 # TODO: make this based on 'filename' so that for debugging I can run this function based on filename and return later.

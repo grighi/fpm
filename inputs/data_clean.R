@@ -1,4 +1,4 @@
-#!/bin/Rscript
+#!/usr/local/bin/Rscript
 # This pulls the relevant information from the various CPS to create slimmer datasets
 
 library(readstata13)
