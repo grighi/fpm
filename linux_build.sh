@@ -4,6 +4,9 @@
 # pip install bs4
 # pip install pandas
 
+trap exit SIGINT SIGTERM
+
+
 # get asec data
 cd data-asec
 # bash get_asec_dta.sh
@@ -16,11 +19,11 @@ python3 get_dta_files.py
 
 # play with data
 cd ../inputs
-./initialize_env.R
-./data_clean2.R
-./clean_asec.R
-./povline.R
-./kerneling.R
+Rscript initialize_env.R
+Rscript data_clean2.R
+Rscript clean_asec.R
+Rscript povline.R
+Rscript kerneling.R
 
 # put figures in excel, create final write-up
 python3 output_images.py

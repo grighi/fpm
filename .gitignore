@@ -17,5 +17,6 @@ inputs/cache/*
 
 **.log
 **.smcl
-# -- **.do -- need some of these like init.do
+data/dofiles/*
+data-asec/dofiles/*
 **.dct
