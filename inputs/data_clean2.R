@@ -8,19 +8,20 @@ library(data.table)
 library(magrittr)
 library(feather)
 
-# library(foreach)
-library(doParallel)
-# library(parallel)
-# cl <- makeCluster(4)
-# registerDoParallel(cl)
-# library(doMC)
-registerDoParallel(4)
+## library(foreach)
+# library(doParallel)
+## library(parallel)
+## cl <- makeCluster(4)
+## registerDoParallel(cl)
+## library(doMC)
+# registerDoParallel(4)
 
 # tmp <- list()
-foreach(yr = 2018, .errorhandling = 'pass') %do% {
+#foreach(yr = 1999, .errorhandling = 'pass') %do% {
+for (yr in 1999:2012) {
   # on.exit(registerDoSEQ())
   
-   for (mo in 1) {
+   for (mo in 1:12) {
     message(paste(yr, 'Month', mo))
 
     # extract relevant month
@@ -47,11 +48,12 @@ foreach(yr = 2018, .errorhandling = 'pass') %do% {
     #   data.table
     
     # rename weights variable
-    if (yr < 2003 & !(yr == 2000 & mo == 3))
-      names(cps)[grep('_nwsswgt', names(cps))] <- 'weight.fn' else
+# these first two lines used to be necessary:
+#    if (yr < 2003 & !(yr == 2000 & mo == 3))
+#      names(cps)[grep('_nwsswgt', names(cps))] <- 'weight.fn' else
         names(cps)[grep('pwsswgt', names(cps))] <- 'weight.fn'
-    if (yr < 2003 & !(yr == 2000 & mo == 3))
-      names(cps)[grep('_nworwgt', names(cps))] <- 'weight.or' else
+#    if (yr < 2003 & !(yr == 2000 & mo == 3))
+#      names(cps)[grep('_nworwgt', names(cps))] <- 'weight.or' else
         names(cps)[grep('pworwgt', names(cps))] <- 'weight.or'
     cps[is.na(weight.fn), weight.fn := 0]
     cps[is.na(weight.or), weight.or := 0]

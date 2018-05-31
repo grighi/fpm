@@ -1,7 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-python3 translation of script ot download dta files
+THIS SCRIPT IS NOT YET FINISHED.
+
+IT COULD BE WORKED ON TO CHECK VERSIONS OF ASEC FILES
+to see which need to be downloaded
+
+python3 translation of script of download dta files
 for cross-platform compatibility
 """
 
@@ -31,13 +36,13 @@ if 'darwin' in sys.platform:
 
 print("getting NBER do-files...")
 # get dofiles
-dofiles = 'http://www.nber.org/data/cps_basic_progs.html'    
+dofiles = 'http://www.nber.org/data/cps_progs.html'    
 html_page = urlopen(dofiles)
 soup = bs4.BeautifulSoup(html_page, "html5lib")
 urls = []
 for link in soup.findAll('a'):
-    match_dct = re.search('9[7-9].dct|[012][0-9]t?.dct', link.get('href'))
-    match_do  = re.search('9[7-9].do|[012][0-9]t?.do',  link.get('href'))
+    match_dct = re.search('data.*?cpsmar(20)?[012][0-9].dct', link.get('href'))
+    match_do  = re.search('data.*?cpsmar(20)?[012][0-9].do',  link.get('href'))
     if match_dct:
         urls.append('http://www.nber.org' + link.get('href'))
     if match_do:
@@ -76,18 +81,18 @@ tmp_readers = {
 import pandas
 import datetime
 import calendar
-table = pandas.read_html('http://www.nber.org/data/cps_basic_progs.html')[1]
+table = pandas.read_html('http://www.nber.org/data/cps.html')[1]
 table[0][1] = table[0][1] + datetime.date.today().strftime('%B %Y')
 for i in range(12):
     m = list(calendar.month_name)[i+1]
-    table[0] = [re.sub(m + ' ([0-9]{4,})', '\g<1>'+"{:02d}".format(i+1), x) for x in table[0]]
+    table[0] = [re.sub(m + ' ([0-9]{4,})', '\g<1>'+"{:02d}".format(i), x) for x in table[0]]
 
 for nums in range(len(table[0])):
     num = re.findall('[0-9]{6,}', table[0][nums])
     #if re.match('.*Revised', table[0][8]):
     #    return('do something with revised')
     if len(num) == 2:
-        table[0][nums] = range(int(num[0]), int(num[1])+1)
+        table[0][nums] = range(int(num[0]), int(num[1]))
 
 table = table[1:]
 tmp_readers = dict(zip(table[0].tolist(), table[3].tolist()))
@@ -176,7 +181,7 @@ newtime = tsDF['server.ts'].tolist()
 
 files = {k: files[k] for k in urls}  # subset files
 
-# print('note: using Stata installation at /usr/local/stata15/') 
+print('note: using Stata installation at /usr/local/stata15/') 
 
 while urls:
     url = urls.pop(0)
@@ -218,13 +223,12 @@ while urls:
             line = re.sub('local dta.*dta', 'local dta_name '+ dta, line)
             line = re.sub('local dct.*dct', 'local dct_name '+ dct, line)
             text.append(line)
-    with open(reader, 'w', encoding='latin1') as readerlines:
+    with open(reader, 'w') as readerlines:
         readerlines.writelines(text)
-    # now you can run /usr/local/stata15/stata or just have stata on path
-    subprocess.run(['stata', '-e', 'do', reader])
+    subprocess.run(['/usr/local/stata15/stata', '-e', 'do', reader])
     os.utime(dta, (time.time(), files[url][2]))
 
-    
+
 
 #def download(url):
 #    local_filename, headers = urlretrieve(url, url2filename(url))

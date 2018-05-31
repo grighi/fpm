@@ -15,6 +15,8 @@ setwd('../data-intermediate/')
 ind <- function(yr,mo) 12 * (yr - 1999) + mo  # handy index identifier
 comb <- function(x, y) mapply(c, x, y, SIMPLIFY=FALSE)  # for multicore
 
+print('calculating fpm ... ')
+
 st <- system.time({
   years <- 1999:2016
   monthly.poverty <- foreach(yr = rep(years,100), .combine = 'comb') %dopar% {
@@ -27,7 +29,8 @@ st <- system.time({
     
     cps.yr <- yr+1
     asec.yr <- yr+1
-    message(paste(yr, 'from', cps.yr, 'data and', asec.yr, 'asec'))
+    # to see which years are being calculated:
+    #message(paste(yr, 'from', cps.yr, 'data and', asec.yr, 'asec'))
     
     # get asec data
     asec.incomes <- data.frame(feather::read_feather(paste0('asec', asec.yr, 'sample.f')))

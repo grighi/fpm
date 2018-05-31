@@ -18,6 +18,7 @@ import subprocess
 import glob
 
 
+print('getting ASEC zip files...')
 url = 'http://www.nber.org/data/cps.html'
 html_page = urlopen(url)
 soup = bs4.BeautifulSoup(html_page, "html5lib")
@@ -30,6 +31,7 @@ for link in soup.findAll('a'):
 # drop the 2001 SCHIP file from downloaded files
 urls.remove('http://www.nber.org/cps/cpsmar2001.zip')
 
+print('unzipping...')
 zipped = []
 #def download(url):
 #    local_filename, headers = urlretrieve(url, url2filename(url))
@@ -39,7 +41,6 @@ zipped = []
 for url in urls:
     local_filename, headers = urlretrieve(url, url2filename(url))
     zipped.append(local_filename)
-
 
 zipped = glob.glob('*.zip')
 datafiles = []
@@ -55,6 +56,7 @@ for zip_path in zipped:
 
 
 # now get the associated dofiles
+print('fetching do files...')
 dofiles = 'http://www.nber.org/data/cps_progs.html'    
 html_page = urlopen(dofiles)
 soup = bs4.BeautifulSoup(html_page, "html5lib")
@@ -80,8 +82,9 @@ for dct in dcts:
         tmp = lines.readline()
         txt = lines.read().splitlines(True)
         txt[0] = re.sub('dictionary using .*.raw', 'infile dictionary', tmp)
-    with open(dct, 'w') as lines:
+    with open(dct, 'w', encoding='latin1') as lines:
         lines.writelines(txt)
+# for some reason we have latin1 encoding ... it would be nice to have a set of UTF8 files
         
 # the do-files were written with Latin-1 encoding, so they should be read as
 # such, or they can be replaced with unicode encoding, basics of which are:
@@ -108,8 +111,10 @@ for do in dos:
             # remove semicolon if there
             text[saveline] = re.sub('(save.*replace);', '\g<1>\n', text[saveline])
         del saveline, delimline
-    with open(do, 'w') as lines:
+    with open(do, 'w', encoding='latin1') as lines:
         lines.writelines(text)
+
+print('convert DATs into DTAs...')
 
 # get names of datafiles
 import glob
@@ -135,19 +140,17 @@ datafiles = [re.sub('dta', 'dat', x) for x in datafiles]
 
 
 for datafile in datafiles:
-    
     # get some filenames
     reader = re.sub('dat', 'do', datafile)
     dct    = re.sub('dat', 'dct', datafile)
     dta    = re.sub('dat', 'dta', datafile) 
-    
     # substitute items in do-file to match our object
-    with open(reader, 'r', encoding = "latin-1") as readerlines:
+    with open(reader, 'r', encoding = "latin1") as readerlines:
         text = []
         for line in readerlines:
             # strip quotes if present
             line = re.sub('(local d.._name )"(.*)"', '\g<1>\g<2>', line)  # drops quotes
-            # add correct filenames
+            # add correct filenames:
             line = re.sub('local dat.*dat', 'local dat_name '+ datafile, line)
             line = re.sub('local dta.*dta', 'local dta_name '+ dta, line)
             line = re.sub('local dct.*dct', 'local dct_name '+ dct, line)
@@ -155,9 +158,8 @@ for datafile in datafiles:
             line = re.sub('(quietly infile using )(cpsmar[0-9]*)', 
                           '\g<1>\g<2>.dct, using(\g<2>.dat)', line)
             text.append(line)
-    with open(reader, 'w') as readerlines:
+    with open(reader, 'w', encoding='latin1') as readerlines:
         readerlines.writelines(text)
-    
     subprocess.run(['stata', '-e', 'do', reader])
 
 
@@ -167,8 +169,9 @@ os.makedirs('dta', exist_ok = True)
 for file in glob.glob('*.dta'):
     m = re.search('[0-9]{4}', file)
     if m:
-        os.rename(file, 'cpsmar' + m[0][2:4] + '.dta')
-        file = 'cpsmar' + m[0][2:4] + '.dta'
+        m = m.group()
+        os.rename(file, 'cpsmar' + m[2:4] + '.dta')
+        file = 'cpsmar' + m[2:4] + '.dta'
     os.rename(file, 'dta/'+file)
 os.makedirs('logs', exist_ok = True)
 for file in glob.glob('*.log'):
@@ -182,6 +185,7 @@ for file in glob.glob('*.do'):
 for file in glob.glob('*.dct'):
     os.rename(file, 'dofiles/'+file)
 
+print('...done')
 
 
 
