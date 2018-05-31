@@ -14,7 +14,7 @@ mo <- 3
 # to do: check all files in data-asec with "Stata ready CPS march supp blabla"
 # migrate to using only those files
 
-for (yr in 2017) {
+for (yr in 2000:2017) {
   message(paste(yr, 'Month', mo))
   index <- yr - 1999
 
@@ -111,7 +111,7 @@ for (yr in 2017) {
     asec[nppl > 11, nppl := 11]
   }
   
-  # Koji does this but it appears less precise:
+  # Koji does the following, but it appears to yield less precise results:
   # asec <- asec[perrp %in% 1:2]
   
   #cps[, id := paste(hrhhid, pulineno)]
