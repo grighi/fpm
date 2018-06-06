@@ -1,0 +1,126 @@
+
+Install/Update Windows 10
+Install Ubuntu
+
+# You need to do two things before watching the walkthrough. 
+# First, copy stata and your walkthrough to C:\Users\(INSERT YOUR USER NAME)\AppData\Local\Packages\CanonicalGroupLimited.UbuntuonWindows_79rhkp1fndgsc (VARIES BY MACHINE)\LocalState\rootfs\home
+
+------------------
+
+# Next, open Ubuntu and run (it will ask you for your password):
+# sudo apt install python
+# sudo apt install python3-pip
+# pip3 install --upgrade pip
+# pip install asciinema
+
+# Then watch the walkthrough with:
+# python3 -m asciinema play walkthrough
+
+------------------- 
+
+# welcome to the terminal
+# open up another terminal so you can follow along this recording. tap space bar to pause and play.
+# this terminal is running a bash shell. This means that we communicate with the computer using the bash scripting language. At the most basic level, there's no graphical user interface. No windows, no cursor. We could set these up if we wanted them, but we don't need them for this project. We can just make use of the terminal.
+# in bash, a line started with a # is a comment, so these lines aren't doing anything
+
+# some bash basics:
+# cd -- change directory (folder)
+# ls -- list contents
+# pwd -- print working directory
+# try this:
+ls  # (now press "enter")
+cd fpm
+pwd
+ls
+cd .. # move up one in directory hierarchy
+pwd
+ls
+
+# With these commands, you should see how you can move around in the directory hierarchy.
+
+# before we start everything, use Windows to copy over your Stata package to the following directory: C:\Users\CPI\AppData\Local\Packages\CanonicalGroupLimited.UbuntuonWindows_79rhkp1fndgsc\LocalState\rootfs\home
+# tap the space bar now to pause this recording
+sudo 
+# now let's install the software we'll need.
+# in the ubuntu operating system, the command 'apt' can get most of the software you'll need. It is a package manager like an "app store". The linux community maintains up-to-date versions of all software for all linux computers (just like microsoft maintains the app store for windows users, etc.). Type in your password when prompted.
+
+sudo apt install git
+
+sudo apt install python3
+
+sudo apt install r-base
+
+sudo apt install pandoc
+
+sudo apt install python3-pip
+pip3 install --upgrade pip
+
+# now use pip to download python-specific files
+pip install --user 'bs4'
+pip install --user 'html5lib'
+pip install --user 'pandas'
+pip install --user 'lxml'
+
+# now let's descend into R to install the first package. This will also create the package directory that we will use later when installing our other necessary packages.
+R
+> install.packages('magrittr')
+... follow prompts
+...
+
+
+# now we need to install stata
+mkdir /usr/local/stata15
+chmod 755 /usr/local/stata15  # modify permissions (for safety)
+# move our tar package in there
+mv Stata15.tar.gz /usr/local/stata15
+# change directory to stata
+cd /usr/local/stata15
+# unpack tar package verbosely
+tar -xzvf Stata15.tar.gz
+# now we want to run the install script. follow the prompts.
+sudo ./install
+
+# now stata will run.
+stata
+.exit
+
+# (this bit is confusing, just trust it):
+# add stata to PATH so that computer can find file again
+echo 'export PATH=$PATH:/usr/local/stata15' >> ~/.bashrc
+source ~/.bashrc
+
+cd ~  # go back home
+
+# now that we have git, we can download the project
+git clone https://github.com/grighi/fpm.git
+
+pwd 
+
+# notice that folders and files are different colors
+
+cd fpm
+
+ls
+
+# we are all set up.
+# what will need to be re-done to run this all under windows?
+# for windows, we will want a build script that runs in powershell.
+# let's take a look at the build script. the next command will open up an editor, REMEMBER: type q to exit.
+less linux_build.sh
+# notice that the script was relatively simple: mostly running R and python things over and over.
+# however, I did not translate it because there are always hiccups when converting from linux to windows (like with macintosh to windows). for example, some path names will need to be changed, etc.
+
+# Don't worry about breaking things, since you can dump everything and start from scratch. If something starts giving you errors and you want to stop it, press Ctrl+C. Try it:
+sleep 60
+# now press Ctrl+C
+
+
+# Now we will run the build script. it is a bash script, so it uses the same scripting language as this terminal. We can run it in a subshell by calling the command bash:
+bash linux_build.sh
+
+
+
+
+
+
+
