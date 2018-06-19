@@ -1,5 +1,6 @@
 #!/usr/local/bin/Rscript
-# This pulls the relevant information from the various CPS to create slimmer datasets
+# script pulls the relevant information from the various CPS to create slimmer datasets
+# it is not currently used
 
 # TODO: make this based on 'filename' so that for debugging I can run this function based on filename and return later.
 # e.g. I could have a clean() function that is looped through filenames

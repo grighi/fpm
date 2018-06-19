@@ -1,6 +1,7 @@
 #!/usr/local/bin/Rscript
 # Download required pacakges
-# June 1, 2017 -- G Righi -- modified from GS-Lab script
+# June 1, 2017
+# giovanni righi
 
 # Local_build will be TRUE if this script was called from initialize_local.sh
 # build <- commandArgs(TRUE)[1]

@@ -1,5 +1,7 @@
 #!/usr/local/bin/Rscript
-# Calculate families' poverty status from the ASEC. This is as close as we can get to replicating the official poverty measure.
+# replicate the official poverty measure using the ASEC
+# giovanni righi
+# May 10 2017
 
 library(data.table)
 library(readstata13)

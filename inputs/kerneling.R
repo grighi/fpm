@@ -1,6 +1,8 @@
 #!/usr/local/bin/Rscript
 # This script resamples ASEC incomes to get income estimates in the monthly CPS. It 
 # does this separately for primary families and unrelated subfamilies.
+# October 2016
+# giovanni righi
 
 library(feather)
 library(data.table)

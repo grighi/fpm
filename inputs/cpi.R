@@ -1,4 +1,5 @@
-# Get most recent CPI and save as dataframe
+# Get most recent consumer price index and save as dataframe
+# author: giovanni righi
 
 library(blsAPI)
 library(rjson)
