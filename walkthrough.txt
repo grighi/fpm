@@ -69,14 +69,14 @@ R
 
 
 # now we need to install stata
-mkdir /usr/local/stata15
-chmod 755 /usr/local/stata15  # modify permissions (for safety)
+sudo mkdir /usr/local/stata15
+sudo chmod 755 /usr/local/stata15  # modify permissions (for safety)
 # move our tar package in there
-mv Stata15.tar.gz /usr/local/stata15
+sudo mv Stata15Linux64.tar.gz /usr/local/stata15
 # change directory to stata
 cd /usr/local/stata15
 # unpack tar package verbosely
-tar -xzvf Stata15.tar.gz
+sudo tar -xzvf Stata15Linux64.tar.gz
 # now we want to run the install script. follow the prompts.
 sudo ./install
 
