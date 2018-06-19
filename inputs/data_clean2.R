@@ -19,7 +19,7 @@ library(feather)
 
 # tmp <- list()
 #foreach(yr = 1999, .errorhandling = 'pass') %do% {
-for (yr in 1999:2012) {
+for (yr in 1999:2017) {
   # on.exit(registerDoSEQ())
   
    for (mo in 1:12) {

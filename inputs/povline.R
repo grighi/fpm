@@ -15,6 +15,8 @@ source('thresholds.R')
 # datafiles names
 files <- paste0('../data-asec/dta/cpsmar', sprintf(0:99, fmt = '%0.2i'), '.dta')
 
+print('calculating official poverty for...')
+
 poverty <- vector(length = 16)
 for (yr in 1999:2016) {
   message(yr)
@@ -23,6 +25,7 @@ for (yr in 1999:2016) {
   
   cached <- paste0('cache/asec', substr(yr,3,4))
   i <- yr - 1999 + 1  # poverty calculating uses subsequent ASEC
+                      # so 1999 poverty measure uses 2000 ASEC, etc.
   if (rewrite | !file.exists(cached)){  
     asec <- read.dta13(files[i],
                        convert.factors = F)

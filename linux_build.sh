@@ -6,19 +6,26 @@
 
 trap exit SIGINT SIGTERM
 
+echo 'Do you want to download all data files again? y/[n]'
+read yesno
 
-# get asec data
-cd data-asec
-# bash get_asec_dta.sh
-python3 get_asec_dta.py
+if [ "$yesno" == "y" ]; then
+  # get asec data
+  cd data-asec
+  # bash get_asec_dta.sh
+  python3 get_asec_dta.py
 
-# get monthly data
-cd ../data
-# bash get_dta_files.sh
-python3 get_dta_files.py
+  # get monthly data
+  cd ../data
+  # bash get_dta_files.sh
+  python3 get_dta_files.py
+  cd ../inputs
+else
+  echo 'continuing...'
+  cd inputs
+fi
 
 # play with data
-cd ../inputs
 Rscript initialize_env.R
 Rscript data_clean2.R
 Rscript clean_asec.R
