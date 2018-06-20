@@ -20,3 +20,8 @@ inputs/cache/*
 data/dofiles/*
 data-asec/dofiles/*
 **.dct
+
+inputs/seasonal_adjustment/measures.csv
+inputs/seasonal_adjustment/out
+
+

@@ -16,7 +16,7 @@ cat("Installing required R packages.\n")
 
 ## Install CRAN Packages
 packages <- c("data.table", "readstata13", "feather", "blsAPI", "rjson",
-              "randomForest", "doMC", "magrittr", "plyr")
+              "randomForest", "doMC", "doParallel", "magrittr", "plyr")
 
 repo <- "http://cran.cnr.Berkeley.edu/"
 

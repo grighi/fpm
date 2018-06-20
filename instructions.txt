@@ -5,6 +5,11 @@ This project calculates a frequent poverty measure by pulling down the Curren Po
 
 To do this, it relies on several pieces of software. You need to download and install Stata, git, R, and python 3.6. The build script is currently written for a unix-like machine (linux or Mac), but a similar build script could be written for Windows (one option is to write a build script in python). These instructions assume you'll use a unix-like environment.
 
+1a. Software
+
+For those not used to UNIX environments, there is a walkthrough included. It describes how to install all software when using the Windwos Subsystem for Ubuntu in Windows 10.
+
+Git is a version-control program. This means it saves all versions of our code as we move through our project. It can push to a cloud-based repository, github. Once the code is in github, anyone with the appropriate permissions can access the code. The basic commands are "git clone" to initially download a repository and "git pull origin master" to fetch updates to the code. Anyone working on the code should refer to chapters 1 and 2 of the book Pro Git.
 
 2. Folders
 
@@ -15,7 +20,7 @@ To do this, it relies on several pieces of software. You need to download and in
 
 3. Replication instructions (MONTHLY)
 
-The code is made to self-document and reproduce easily. Open a terminal, navigate to your working directory, and:
+The code is made to self-document and reproduce easily. Assuming you're using a UNIX-like environment (Linux, Mac), open a terminal, navigate to your working directory, and:
 
 ```
 git clone https://github.com/grighi/fpm.git
@@ -28,6 +33,18 @@ Every month, you will need to rerun linux_build.sh or your build script. This sh
 
 4. Seasonal Adjustment
 
-This is not currently implemented, but a basic.spc file is included to seasonally adjust the data with x13as. This is BLS software that can be downloaded from the web.
+This is not currently implemented, but a basic.spc file is included to seasonally adjust the data with x13as. This is BLS software that can be downloaded from the web. It must be compiled from source, and there are no publicly maintained versions for any filesystem, so the seasonal adjustment is not included in this project. Note: in compiling this program, I had to drop the "-static" flag from the makefile so that ld could find my gfortran library. 
+
+Once the binary is compiled and callable, the seasonal_adjustment.sh script gives guidance on the calculations.
+
+Alternatively, in Windows, the seasonal adjustment can be done in a GUI with the eViews.
+
+5. To-do
+
+* Remove the Stata dependency by writing scripts that clean CPS files with python. This could be made easy by using AWK to convert NBER dct files to python code. Files can be read using pandas.read_fwf and saved using feather.
+* Implement better comparison of ASEC and CPS data. Are there good optimization targets? Perhaps we want to minimize the difference between ASEC in year t and the mean of a poverty prediction in t+1. 
+
+
+
 
 

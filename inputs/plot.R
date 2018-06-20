@@ -22,7 +22,8 @@ poverty          <- as.vector(unlist(feather::read_feather('../inputs/calculated
 official.poverty <- c(11.9, 11.3, 11.7, 12.1, 12.5, 12.7, 12.6, 12.3, 12.5, 13.2, 14.3, 15.1, 15, 15, 14.5, 14.8, 13.5, 12.7)
 
 for(i in 1:2) {
-  ifelse(i==1, png('../fpm.png'), pdf('../fpm.pdf'))
+  if (i==1) png('../fpm.png')
+    else pdf('../fpm.pdf')
   ylim <- c(0.1, 0.16)  # for simple FPM
   xlim <- c(as.Date('1998-01-01'), as.Date('2018-12-01'))
   plot(as.Date('1990-12-01'), 0, ylab = 'poverty rate', xlab = 'year', 
@@ -84,6 +85,11 @@ lines(time+1, children.nw.poverty, col = 'coral4')
 dev.off()
 
 paste('latest earnings poverty at', tail(time,1), ':', round(tail(children.nw.poverty,1), 3))
+
+write.table(
+  cbind(monthly.poverty, monthly.poverty.sd, earnings.poverty,
+        earnings.poverty.sd, children.nw.poverty, children.nw.poverty.sd), 
+  '../inputs/seasonal_adjustment/measures.csv', row.names = F, col.names = F, sep = '\t')
 
 # # or, for fun:
 # zoo::rollmean(monthly.poverty, 12) %>%

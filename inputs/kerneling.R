@@ -29,8 +29,8 @@ st <- system.time({
     # resulting vector has length 12*(number of years)*(number of reps), and statistics are 
     # taken across the replications.
     
-    cps.yr <- yr
-    asec.yr <- yr
+    cps.yr <- yr + 1
+    asec.yr <- yr + 1
     # to see which years are being calculated:
     #message(paste(yr, 'from', cps.yr, 'data and', asec.yr, 'asec'))
     
