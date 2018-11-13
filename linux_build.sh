@@ -31,6 +31,7 @@ Rscript data_clean2.R
 Rscript clean_asec.R
 Rscript povline.R
 Rscript kerneling.R
+Rscript plot.R
 
 # put figures in excel, create final write-up
 python3 output_images.py
