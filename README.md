@@ -16,7 +16,7 @@ To build the project, make sure you have all the necessary software (Stata, [git
 # from directory where you want to place the project:
 git clone https://github.com/grighi/fpm.git
 
-# make sure Stata is installed and on your path, something like:
+# Stata needs to be installed and on PATH, something like:
 export PATH=$PATH:/Applications/Stata/Stata.app/Contents/MacOS/Stata
 
 # run the build script

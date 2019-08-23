@@ -21,7 +21,7 @@ print('calculating fpm ... ')
 
 st <- system.time({
   years <- 1999:2016
-  monthly.poverty <- foreach(yr = rep(years,100), .combine = 'comb') %dopar% {
+  monthly.poverty <- foreach(yr = rep(years,10), .combine = 'comb') %dopar% {
     # this code is setup to run in parallel to produce many replications across years very quickly.
     # to do this, it uses %dopar% ('doparallel') from the doMC ('do multicore') package. It is 
     # embarassingly parallel because it loops over our years, creating a vector of length 12
